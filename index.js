@@ -1,24 +1,22 @@
 const express = require('express')
 const cors = require('cors')
-require("dotenv").config()
+
 const mongoose = require('mongoose')
 
 const app = express()
 app.use(cors())
 app.use(express.json())
+require("dotenv").config()
 
 mongoose.connect(process.env.MONGO_URI).then(() => {
     console.log("connected to database")
-}).catch(() => {
-    console.log("Connected to failed")
+}).catch((error) => {
+    console.log("Connected to failed",error)
 })
 
 const nodemailer = require('nodemailer')
 
 const credential = mongoose.model('credential', {}, "bulkmail")
-
-
-
 
 app.post('/sendemail', (req, res) => {
     var msg = req.body.msg
@@ -58,7 +56,7 @@ app.post('/sendemail', (req, res) => {
         console.log(error)
     })
 })
-const PORT =process.env.PORT || 3000
+const PORT =process.env.PORT
 app.listen(PORT,() => {
-    console.log('server is running on port 3000')
+    console.log(`server is running on port 3000 ${PORT}`)
 })

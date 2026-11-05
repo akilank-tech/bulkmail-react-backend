@@ -1,0 +1,63 @@
+const express = require('express')
+const cors = require('cors')
+const mongoose = require('mongoose')
+
+const app = express()
+app.use(cors())
+app.use(express.json())
+
+mongoose.connect("mongodb+srv://20bcs115akilank_db_user:9R3TEoP9vJYaTGHI@cluster0.eaby658.mongodb.net/passkey").then(() => {
+    console.log("connected to database")
+}).catch(() => {
+    console.log("Connected to failed")
+})
+
+const nodemailer = require('nodemailer')
+
+const credential = mongoose.model('credential', {}, "bulkmail")
+
+
+
+
+app.post('/sendemail', (req, res) => {
+    var msg = req.body.msg
+    var emaillist = req.body.emaillist
+    credential.find().then((data) => {
+        console.log(data[0].toJSON())
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: data[0].toJSON().user,
+                pass: data[0].toJSON().pass,
+            }
+        })
+        new Promise(async (resolve, reject) => {
+            try {
+                for (var i = 0; i < emaillist.length; i++) {
+                    await transporter.sendMail({
+                        from: '20bcs115.akilan.k@gmail.com',
+                        to: emaillist[i],
+                        subject: 'A Message from Bulk Mail App',
+                        text: msg
+                    }
+                    )
+                    console.log("Email sent to:" + emaillist[i])
+                }
+                resolve("success")
+            }
+            catch (error) {
+                reject("failed")
+            }
+        }).then(() => {
+            res.send(true)
+        }).catch(() => {
+            res.send(false)
+        })
+    }).catch((error) => {
+        console.log(error)
+    })
+})
+
+app.listen(3000, () => {
+    console.log('server is running on port 3000')
+})

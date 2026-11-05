@@ -1,12 +1,13 @@
 const express = require('express')
 const cors = require('cors')
+require("dotenv").config()
 const mongoose = require('mongoose')
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 
-mongoose.connect("mongodb+srv://20bcs115akilank_db_user:9R3TEoP9vJYaTGHI@cluster0.eaby658.mongodb.net/passkey").then(() => {
+mongoose.connect(process.env.MONGO_URI).then(() => {
     console.log("connected to database")
 }).catch(() => {
     console.log("Connected to failed")
@@ -57,7 +58,7 @@ app.post('/sendemail', (req, res) => {
         console.log(error)
     })
 })
-
-app.listen(3000, () => {
+const PORT =process.env.PORT || 3000
+app.listen(PORT,() => {
     console.log('server is running on port 3000')
 })
